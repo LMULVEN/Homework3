@@ -1,0 +1,243 @@
+---
+title: "Homework 3: Submission 3"
+subtitle: "Research Methods, Spring 2024"
+author: Leila Mulveny
+format:
+  pdf:
+    output-file: "mulveny-l-hwk3-3"
+    output-ext:  "pdf"
+    header-includes:
+      - \usepackage{float}
+      - \floatplacement{table}{H}
+      - \usepackage{hyperref}
+abstract: |
+  \href{https://github.com/LMULVEN/Homework3}{Homework 3: Repository} 
+---
+
+```{r}
+#| include: false
+
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, ggplot2, dplyr, lubridate, stringr, readxl, data.table, gdata, fixest, knitr, modelsummary, AER, here)
+```
+
+```{r}
+#| include: false
+#| eval: true
+load("Hwk3_workspace.Rdata")
+```
+
+\newpage
+# Summarize The Data
+
+\vspace{.2in}
+\noindent 1. Present a bar graph showing the proportion of states with a change in their cigarette tax in each year from 1970 to 1985.<br>
+
+
+See @fig-prop:
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-prop
+#| fig-cap: "Proportion of States With a Tax Change in Their Cigarette Tax from 1970-1985"
+
+Q1
+```
+
+We can observe two "spikes" on this bar graph (pertains to our future IV). Around 1970 and 1982 are the years when there was a greater proprtion of states with a change in their cigarette tax. 
+
+\newpage
+\noindent 2. Plot on a single graph the average tax (in 2012 dollars) on cigarettes and the average price of a pack of cigarettes from 1970 to 2018.<br>
+
+
+See @fig-tax:
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-tax
+#| fig-cap: "Average Tax (in 2012 dollars) on Cigarettes and the Average Price of a Pack of Cigarettes from 1970-2018"
+
+Q2
+```
+
+@fig-tax displays a result which we would expect to see—both average price and tax have increased throughout the time period, and price is always above tax (tax is a percentage of price so it has to be below). 
+
+\newpage
+\noindent 3.Identify the 5 states with the highest increases in cigarette prices (in dollars) over the time period. Plot the average number of packs 
+sold per capita for those states from 1970 to 2018.<br>
+
+
+See @fig-top-states:
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-top-states
+#| fig-cap: "Average Number of Packs Sold per Capita for the Top Five States with the Highest increases in Cigarette Prices (in dollars) from 1970-2018"
+
+Q3
+```
+
+\newpage
+\noindent 4. Identify the 5 states with the lowest increases in cigarette prices (in dollars) over the time period. Plot the average number of packs 
+sold per capita for those states from 1970 to 2018.<br>
+
+See @fig-bottom-states:
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-bottom-states
+#| fig-cap: "Average Number of Packs Sold per Capita for the Bottom Five States with the Lowest increases in Cigarette Prices (in dollars) from 1970-2018"
+
+Q4
+```
+
+\newpage
+\noindent 5.Compare the trends in sales from the 5 states with the highest price increases to those with the lowest price increases.<br>
+
+See @fig-compare-states:
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-compare-states
+#| fig-cap: "Comparison of the Trends in Sales From the 5 States with the Highest Price Increase to Those with the Lowest Price Increases"
+
+Q5
+```
+
+Both the states with the highest price increase and those with the lowest price increase demonstrate a similar trend, which is a decrease in average sales per capita from 1970 - 2020. The states with the lowest price increases display a slower decrease in sales when compared to the states with the highest price increases. This trend is what we would expect to see given the law of demand (as price increases, quantity demanded decreases). 
+
+\newpage
+# Estimate ATEs
+\noindent Now let’s work on estimating a demand curve for cigarettes. Specifically, we’re going to estimate the price elasticity of demand for cigarettes. When explaining your findings, try to limit your discussion just to a couple of sentences..
+
+
+\newpage
+\noindent 6. Focusing only on the time period from 1970 to 1990, regress log sales on log prices to estimate the price elasticity of demand over that period. Interpret your results.<br>
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "Regression Output of Log(Sales) on Log(Prices)"
+
+regression_table_model1 %>%
+  knitr::kable("latex", booktabs = TRUE) %>%
+  kableExtra::kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+The results displayed in **Table 1** show a coefficient of -0.809 which is the estimated price elasticity of demand. It means that a 1% increase in cigarette price is associated with a decrease of about 0.809% in sales. This is result makes sense: as a normal good quantity demanded of cigarettes should decrease as price increases. 
+
+\newpage
+\noindent 7. Again limiting to 1970 to 1990, regress log sales on log prices using the total (federal and state) cigarette tax (in dollars) as an instrument for log prices. Interpret your results and compare your estimates to those without an instrument. Are they different? If so, why?
+
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "Regression Output of Log(Sales) on Log(Prices) with Cigarette Tax as an Instrumental Variable"
+
+regression_table_model2 %>%
+  knitr::kable("latex", booktabs = TRUE) %>%
+  kableExtra::kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+The results displayed in **Table 2** show a coefficient of about -0.8 which is the estimated price elasticity of demand. It means that a 1% increase in cigarette price is associated with a decrease of about 0.8% in sales. Again, this is intuitive because an increase in price should result in a decrease in quantity demand. This beta is slightly smaller in absolute value than the beta estimated in **Table 2**, we can assume that the coefficient for **Table 1** is slightly larger due to unaccounted for endogeneity between price and the error term, which the instrument accounts for in **Table 2**. 
+
+
+\newpage
+\noindent 8. Show the first stage and reduced-form results from the instrument.<br>
+
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "First Stage Regression Output of Log(Sales) on Log(Prices) with Cigarette Tax as an Instrumental Variable"
+
+regression_table_first_stage %>%
+  knitr::kable("latex", booktabs = TRUE) %>%
+  kableExtra::kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "Reduced Form Regression Output of Log(Sales) on Log(Prices) with Cigarette Tax as an Instrumental Variable"
+
+regression_table_reduced_form %>%
+  knitr::kable("latex", booktabs = TRUE) %>%
+  kableExtra::kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+\newpage
+# Estimate ATEs
+\noindent Question 9
+\noindent Repeat questions 6-8 focusing on the period from 1991 to 2015.<br>
+
+\newpage
+\noindent 9.1 Focusing only on the time period from 1991 to 2015, regress log sales on log prices to estimate the price elasticity of demand over that period. Interpret your results.<br>
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "Regression Output of Log(Sales) on Log(Prices) from 1991-2015"
+
+regression_table_model_1 %>%
+  knitr::kable("latex", booktabs = TRUE) %>%
+  kableExtra::kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+The results in **Table 5** display a coefficient for "ln_price" of -0.99. It means that a 1% increase in price is associated with a decrease of about 0.99% in sales, which is nearly 1-1 (price elasticity of a unit elastic good). 
+
+\newpage
+\noindent 9.2 Again limiting to 1991 to 2015, regress log sales on log prices using the total (federal and state) cigarette tax (in dollars) as an instrument for log prices. Interpret your results and compare your estimates to those without an instrument. Are they different? If so, why?
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "Regression Output of Log(Sales) on Log(Prices) with Cigarette Tax as an Instrumental Variable from 1991-2015"
+
+regression_table_model_2 %>%
+  knitr::kable("latex", booktabs = TRUE) %>%
+  kableExtra::kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+The results displayed in **Table 6** show a coefficient of -1.15 while **Table 5** yeilds a coefficient of -0.99. Both are negative, but the coefficient of -1.15 is much larger in absolute value than -0.99. This suggests that when accounting for the potential endogeneity of price (using "ln_total_tax" as an instrument), a 1% increase in price is associated with a larger decrease in sales (about 1.15% instead of 0.99%). The differences could be due to the endogeneity of "ln_price", which **Table 6** tries to correct for by using "ln_total_tax" as an instrument. 
+
+\newpage
+\noindent 9.3 Show the first stage and reduced-form results from the instrument.<br>
+
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "First Stage Regression Output of Log(Sales) on Log(Prices) with Cigarette Tax as an Instrumental Variable from 1991-2015"
+
+regression_table_first_stage_2 %>%
+  knitr::kable("latex", booktabs = TRUE) %>%
+  kableExtra::kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "Reduced Form Regression Output of Log(Sales) on Log(Prices) with Cigarette Tax as an Instrumental Variable from 1991-2015"
+
+regression_table_reduced_form_2 %>%
+  knitr::kable("latex", booktabs = TRUE) %>%
+  kableExtra::kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+
+\newpage
+\noindent 10. Compare your elasticity estimates from 1970-1990 versus those from 1991-2015. Are they different? If so, why?<br>
+
+The estimated price elasticity of demand is around -0.8 in **Table 2** and -1.15 **Table 6**. While both estimates are negative, **Table 6** estimates a larger price elasticity of demand in absolute value. Overtime demand for cigarettes became more of elastic. Cigarette smoking was much more prevelant from 1970-1990, and because of the addictive quality of cigarettes we would expect demand to more more inelastic in 1970-1990 than compared to 1991-2015. This explains why the price elasticity of demand is smaller in absolute value from 1970-1990 (its behaving more so as a necessary good).
+
+
+
+
+
